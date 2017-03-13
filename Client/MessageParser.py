@@ -37,7 +37,8 @@ class MessageParser():
 
     def parse_history(self, payload):
         for msg in payload['content']:
-            self.print_message('HISTORY', msg)
+            msg = json.loads(msg)
+            self.print_message(msg['sender'], msg['content'])
 
 
 class tcolors:

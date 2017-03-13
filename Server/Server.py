@@ -16,8 +16,9 @@ users = {}
 
 def send_to_chatroom(chatroom, sender, response, content):
     for username, user in chatrooms[chatroom].items():
-        user.send(sender, response, content)
-
+        msg = user.send(sender, response, content)
+    return msg
+	
 def send_to_user(username, sender, response, content):
     users[username].send(sender, response, content)
 
@@ -152,8 +153,8 @@ class ClientHandler(socketserver.BaseRequestHandler):
         self.connection.shutdown(socket.SHUT_RDWR)
 
     def handle_msg(self, payload):
-        send_to_chatroom(self.chatroom, self.username, 'message', payload['content'])
-        history[self.chatroom].append(payload['content'])
+        msg = send_to_chatroom(self.chatroom, self.username, 'message', payload['content'])
+        history[self.chatroom].append(msg)
 
     def handle_names(self, payload):
         names = ", ".join(chatrooms[self.chatroom].keys())
@@ -177,6 +178,7 @@ class ClientHandler(socketserver.BaseRequestHandler):
         })
 
         self.connection.send(msg.encode("utf-8"))
+        return msg
 
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -195,7 +197,7 @@ if __name__ == "__main__":
 
     No alterations are necessary
     """
-    HOST, PORT = 'localhost', 9998
+    HOST, PORT = '0.0.0.0', 9998
     print ('Server running...')
 
     # Set up and initiate the TCP server
